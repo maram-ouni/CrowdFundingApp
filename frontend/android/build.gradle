@@ -1,0 +1,70 @@
+// buildscript {
+//     ext.kotlin_version = '1.8.20'
+//     repositories {
+//         google()
+//         jcenter()
+//     }
+
+//     dependencies {
+//         classpath 'com.android.tools.build:gradle:7.0.4'
+//         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+//     }
+// }
+
+// allprojects {
+//     repositories {
+//         google()
+//         jcenter()
+//     }
+// }
+
+// rootProject.buildDir = '../build'
+// subprojects {
+//     project.buildDir = "${rootProject.buildDir}/${project.name}"
+// }
+// subprojects {
+//     project.evaluationDependsOn(':app')
+// }
+
+// tasks.register("clean", Delete) {
+//     delete rootProject.buildDir
+// }
+
+
+buildscript {
+    ext.kotlin_version = '1.6.10' // Updated Kotlin version
+    repositories {
+        google()
+        mavenCentral() // Use Maven Central instead of JCenter (deprecated)
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.4.2' // Updated Gradle plugin version
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20"
+    }
+  
+
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral() // Use Maven Central for dependencies
+    }
+}
+
+// Define build directories
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+
+// Ensure proper dependency evaluation
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+// Clean task
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
