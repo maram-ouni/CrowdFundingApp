@@ -129,7 +129,7 @@ Future<dynamic> getCampsInvestedByUser(String token) async {
   };
 
   var request = http.Request(
-      'GET', Uri.parse('http://3.135.1.141/api/getCampsInvestedByUser'));
+      'GET', Uri.parse('http://192.168.56.1:8080/api/getCampsInvestedByUser'));
 
   request.headers.addAll(headers);
 

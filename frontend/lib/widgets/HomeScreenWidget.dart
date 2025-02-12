@@ -14,8 +14,8 @@ class HomeScreenWidget extends StatefulWidget {
 
 class _HomeScreenWidgetState extends State<HomeScreenWidget> {
   String token = "";
-  late Future usersAccountBalance;
-  late Future campList;
+   Future usersAccountBalance= Future.value({});
+  Future campList= Future.value({});
 
   @override
   void initState() {
@@ -296,7 +296,7 @@ Future<dynamic> getUserBalance(String token ) async {
     'Authorization': token
   };
   var request = http.Request(
-      'GET', Uri.parse('http://3.135.1.141/api/getUsersAccountBalance'));
+      'GET', Uri.parse('http://192.168.56.1:8080/api/getUsersAccountBalance'));
   request.headers.addAll(headers);
 
   http.StreamedResponse response = await request.send();
@@ -312,7 +312,7 @@ Future<dynamic> getCamps(String token ) async {
     'Authorization': token
   };
   var request =
-      http.Request('POST', Uri.parse('http://3.135.1.141/api/getCampList'));
+      http.Request('POST', Uri.parse('http://192.168.56.1:8080/api/getCampList'));
   request.body = json.encode({"sort_by": "High target"});
   request.headers.addAll(headers);
 

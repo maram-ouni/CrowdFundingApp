@@ -20,7 +20,7 @@ class CreateCampScreen extends StatefulWidget {
 
 class _CreateCampScreenState extends State<CreateCampScreen> {
   String token="";
-  late File _image ;
+  File _image=File(""); 
   String _imagePath="";
   final picker = ImagePicker();
 
@@ -156,12 +156,19 @@ class _CreateCampScreenState extends State<CreateCampScreen> {
     setToken();
   }
 
-  Future setToken() async {
-    SharedPreferences.getInstance().then((prefValue) {
-      token = prefValue.getString('token')?? "";
-      setState(() {});
-    });
+ Future<void> setToken() async {
+  final prefValue = await SharedPreferences.getInstance();
+  token = prefValue.getString('token') ?? "";
+  
+  if (token.isNotEmpty) {
+    // Token valide, continuez avec la logique de navigation ou d'affichage
+    setState(() {});
+  } else {
+    // Gérer le cas où le token est vide (afficher un message d'erreur, rediriger, etc.)
+    print('Token is empty or invalid');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -422,7 +429,7 @@ Future<dynamic> createCamp(
     'Authorization': token
   };
   var request = http.MultipartRequest(
-      'POST', Uri.parse('http://3.135.1.141/api/createCamp'));
+      'POST', Uri.parse('http://192.168.56.1:8080/api/createCamp'));
   request.fields.addAll({
     'camp_name': campName,
     'camp_equity': equity.toString(),
@@ -438,3 +445,416 @@ Future<dynamic> createCamp(
 
   return await jsonDecode(await response.stream.bytesToString());
 }
+// import 'package:collective/screens/HomeScreen.dart';
+// import 'package:collective/widgets/appBarGoBack.dart';
+// import 'package:flutter/material.dart';
+// import 'dart:io';
+// import 'package:image_picker/image_picker.dart';
+// import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+// import 'package:form_field_validator/form_field_validator.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import 'dart:async';
+// import 'dart:convert';
+// import 'package:http/http.dart' as http;
+
+// class CreateCampScreen extends StatefulWidget {
+//   static String routeName = '/createCampScreen';
+
+//   @override
+//   _CreateCampScreenState createState() => _CreateCampScreenState();
+// }
+
+// class _CreateCampScreenState extends State<CreateCampScreen> {
+//   String token = "";
+//   File _image= File("");  // Changez ici pour une variable nullable
+//   String _imagePath = "";
+//   final picker = ImagePicker();
+
+//   TextEditingController campNameController = TextEditingController();
+//   TextEditingController campEquityController = TextEditingController();
+//   TextEditingController campTargetController = TextEditingController();
+//   TextEditingController campDescriptionController = TextEditingController();
+//   TextEditingController longDescriptionController = TextEditingController();
+//   TextEditingController campCategoryController = TextEditingController();
+
+//   final _formKey = GlobalKey<FormState>();
+
+//   final campNameValidator = MultiValidator([
+//     RequiredValidator(errorText: 'Camp name is required'),
+//   ]);
+
+//   final campEquityValidator = MultiValidator([
+//     RequiredValidator(errorText: 'Equity is required'),
+//   ]);
+
+//   final campTargetValidator = MultiValidator([
+//     RequiredValidator(errorText: 'Target is required'),
+//   ]);
+
+//   final campCategoryValidator = MultiValidator([
+//     RequiredValidator(errorText: 'Category is required'),
+//   ]);
+
+//   final campDescriptionValidator = MultiValidator([
+//     RequiredValidator(errorText: 'Description is required'),
+//     MaxLengthValidator(116, errorText: 'Description cannot be longer than 116 characters.')
+//   ]);
+
+//   @override
+//   void dispose() {
+//     campNameController.dispose();
+//     campEquityController.dispose();
+//     campTargetController.dispose();
+//     campDescriptionController.dispose();
+//     campCategoryController.dispose();
+//     super.dispose();
+//   }
+
+//   Future getImage() async {
+//     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+//     setState(() {
+//       if (pickedFile != null) {
+//         _image = File(pickedFile.path);
+//         _imagePath = pickedFile.path;
+//         print(pickedFile.path);
+//       } else {
+//         print('No image selected.');
+//       }
+//     });
+//   }
+
+//   void createCampMethod() {
+//     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+//       backgroundColor: Colors.white,
+//       duration: Duration(days: 1),
+//       padding: EdgeInsets.only(
+//         top: 300,
+//         bottom: 150,
+//         left: 30,
+//         right: 30,
+//       ),
+//       content: Column(
+//         children: [
+//           Padding(
+//             padding: const EdgeInsets.only(bottom: 20),
+//             child: Text(
+//               "Creating camp",
+//               textAlign: TextAlign.center,
+//               style: TextStyle(
+//                   color: Theme.of(context).primaryColor, fontSize: 20),
+//             ),
+//           ),
+//           SpinKitFadingCube(
+//             color: Theme.of(context).primaryColor,
+//             size: 30.0,
+//           )
+//         ],
+//       ),
+//     ));
+
+//     createCamp(
+//       token,
+//       campNameController.text,
+//       int.parse(campEquityController.text),
+//       int.parse(campTargetController.text),
+//       campDescriptionController.text,
+//       campCategoryController.text,
+//       _imagePath,
+//     ).then(
+//       (data) {
+//         if (data['result'] == true) {
+//           ScaffoldMessenger.of(context).hideCurrentSnackBar();
+//           Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             SnackBar(
+//               backgroundColor: Theme.of(context).primaryColor,
+//               padding: EdgeInsets.all(20),
+//               content: Text(
+//                 "Camp created",
+//                 textAlign: TextAlign.center,
+//                 style: TextStyle(fontSize: 18),
+//               ),
+//             ),
+//           );
+//         } else {
+//           ScaffoldMessenger.of(context).hideCurrentSnackBar();
+//           Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             SnackBar(
+//               backgroundColor: Colors.red,
+//               padding: EdgeInsets.all(20),
+//               content: Text(
+//                 "There was a problem creating the camp",
+//                 textAlign: TextAlign.center,
+//               ),
+//             ),
+//           );
+//         }
+//       },
+//     );
+//   }
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     setToken();
+//   }
+
+//   Future setToken() async {
+//     SharedPreferences.getInstance().then((prefValue) {
+//       token = prefValue.getString('token') ?? "";
+//       setState(() {});
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return SafeArea(
+//       child: Scaffold(
+//         backgroundColor: Colors.white,
+//         appBar: PreferredSize(
+//           preferredSize: const Size.fromHeight(55),
+//           child: AppBarGoBack(),
+//         ),
+//         body: SingleChildScrollView(
+//           child: Column(
+//             children: [
+//               Center(
+//                 child: _image == null
+//                     ? Image.asset(
+//                         'assets/images/Create.png',
+//                         height: 225,
+//                         width: double.infinity,
+//                         fit: BoxFit.cover,
+//                       )
+//                     : Image.file(
+//                         _image,
+//                         height: 225,
+//                         width: double.infinity,
+//                         fit: BoxFit.cover,
+//                       ),
+//               ),
+//               Container(
+//                 height: 452,
+//                 margin: EdgeInsets.only(
+//                   left: 20,
+//                   right: 20,
+//                 ),
+//                 child: Form(
+//                   key: _formKey,
+//                   child: ListView(
+//                     children: [
+//                       Container(
+//                         margin: EdgeInsets.only(top: 30),
+//                         child: TextFormField(
+//                           decoration: InputDecoration(
+//                             labelText: 'Camp name',
+//                             filled: true,
+//                             fillColor: Colors.grey[50],
+//                             focusedBorder: OutlineInputBorder(
+//                               borderRadius: BorderRadius.circular(30),
+//                               borderSide: BorderSide(
+//                                   color: Theme.of(context).primaryColor,
+//                                   width: 1.5),
+//                             ),
+//                             enabledBorder: OutlineInputBorder(
+//                               borderRadius: BorderRadius.circular(30),
+//                               borderSide: BorderSide(
+//                                   color: Colors.grey[300] ?? Colors.grey, width: 1),
+//                             ),
+//                           ),
+//                           controller: campNameController,
+//                           validator: campNameValidator,
+//                         ),
+//                       ),
+//                       Container(
+//                         margin: EdgeInsets.only(top: 12),
+//                         child: TextFormField(
+//                           decoration: InputDecoration(
+//                             labelText: 'Category',
+//                             filled: true,
+//                             fillColor: Colors.grey[50],
+//                             focusedBorder: OutlineInputBorder(
+//                               borderRadius: BorderRadius.circular(30),
+//                               borderSide: BorderSide(
+//                                   color: Theme.of(context).primaryColor,
+//                                   width: 1.5),
+//                             ),
+//                             enabledBorder: OutlineInputBorder(
+//                               borderRadius: BorderRadius.circular(30),
+//                               borderSide: BorderSide(
+//                                   color: Colors.grey[300] ?? Colors.grey, width: 1),
+//                             ),
+//                           ),
+//                           controller: campCategoryController,
+//                           validator: campCategoryValidator,
+//                         ),
+//                       ),
+//                       Container(
+//                         margin: EdgeInsets.only(top: 12),
+//                         child: TextFormField(
+//                           decoration: InputDecoration(
+//                             labelText: 'Description',
+//                             filled: true,
+//                             fillColor: Colors.grey[50],
+//                             focusedBorder: OutlineInputBorder(
+//                               borderRadius: BorderRadius.circular(30),
+//                               borderSide: BorderSide(
+//                                   color: Theme.of(context).primaryColor,
+//                                   width: 1.5),
+//                             ),
+//                             enabledBorder: OutlineInputBorder(
+//                               borderRadius: BorderRadius.circular(30),
+//                               borderSide: BorderSide(
+//                                   color: Colors.grey[300] ?? Colors.grey, width: 1),
+//                             ),
+//                           ),
+//                           controller: campDescriptionController,
+//                           validator: campDescriptionValidator,
+//                         ),
+//                       ),
+//                       Container(
+//                         margin: EdgeInsets.only(top: 12),
+//                         child: TextFormField(
+//                           decoration: InputDecoration(
+//                             labelText: 'Equity',
+//                             filled: true,
+//                             fillColor: Colors.grey[50],
+//                             focusedBorder: OutlineInputBorder(
+//                               borderRadius: BorderRadius.circular(30),
+//                               borderSide: BorderSide(
+//                                   color: Theme.of(context).primaryColor,
+//                                   width: 1.5),
+//                             ),
+//                             enabledBorder: OutlineInputBorder(
+//                               borderRadius: BorderRadius.circular(30),
+//                               borderSide: BorderSide(
+//                                   color: Colors.grey[300] ?? Colors.grey, width: 1),
+//                             ),
+//                           ),
+//                           controller: campEquityController,
+//                           validator: campEquityValidator,
+//                           keyboardType: TextInputType.number,
+//                         ),
+//                       ),
+//                       Container(
+//                         margin: EdgeInsets.only(top: 12),
+//                         child: TextFormField(
+//                           decoration: InputDecoration(
+//                             labelText: 'Target',
+//                             filled: true,
+//                             fillColor: Colors.grey[50],
+//                             focusedBorder: OutlineInputBorder(
+//                               borderRadius: BorderRadius.circular(30),
+//                               borderSide: BorderSide(
+//                                   color: Theme.of(context).primaryColor,
+//                                   width: 1.5),
+//                             ),
+//                             enabledBorder: OutlineInputBorder(
+//                               borderRadius: BorderRadius.circular(30),
+//                               borderSide: BorderSide(
+//                                   color: Colors.grey[300] ?? Colors.grey, width: 1),
+//                             ),
+//                           ),
+//                           controller: campTargetController,
+//                           validator: campTargetValidator,
+//                           keyboardType: TextInputType.number,
+//                         ),
+//                       ),
+//                       Row(
+//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                         children: [
+//                           Container(
+//                             margin: EdgeInsets.only(top: 20, bottom: 20, left: 5),
+//                             child: _image == null
+//                                 ? Text(
+//                                     'No image selected.',
+//                                     style: TextStyle(fontSize: 16),
+//                                   )
+//                                 : Text(
+//                                     'Image selected.',
+//                                     style: TextStyle(fontSize: 16),
+//                                   ),
+//                           ),
+//                           Container(
+//                             margin: EdgeInsets.only(
+//                               top: 20,
+//                               bottom: 20,
+//                               right: 5,
+//                             ),
+//                             child: IconButton(
+//                               onPressed: getImage,
+//                               icon: Icon(Icons.camera_alt_outlined),
+//                               color: Colors.black54,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                       Container(
+//                         margin: EdgeInsets.only(top: 40),
+//                         child: ElevatedButton(
+//                           onPressed: () {
+//                             if (_formKey.currentState?.validate() ?? false) {
+//                               createCampMethod();
+//                             }
+//                           },
+//                           child: Text(
+//                             "Create",
+//                             style: TextStyle(
+//                               color: Colors.white,
+//                               fontSize: 17,
+//                             ),
+//                           ),
+//                           style: ElevatedButton.styleFrom(
+//                             backgroundColor: Theme.of(context).primaryColor,
+//                             shape: RoundedRectangleBorder(
+//                               borderRadius: BorderRadius.circular(30),
+//                             ),
+//                             minimumSize: Size(double.infinity, 50),
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   Future<Map<String, dynamic>> createCamp(
+//     String token,
+//     String campName,
+//     int equity,
+//     int target,
+//     String description,
+//     String category,
+//     String imagePath,
+//   ) async {
+//     final url = Uri.parse('YOUR_API_URL');
+//     var request = http.MultipartRequest('POST', url);
+
+//     request.headers.addAll({
+//       'Authorization': 'Bearer $token',
+//     });
+
+//     request.fields['campName'] = campName;
+//     request.fields['equity'] = equity.toString();
+//     request.fields['target'] = target.toString();
+//     request.fields['description'] = description;
+//     request.fields['category'] = category;
+
+//     if (imagePath.isNotEmpty) {
+//       request.files.add(await http.MultipartFile.fromPath('image', imagePath));
+//     }
+
+//     var response = await request.send();
+//     var responseData = await response.stream.bytesToString();
+//     return json.decode(responseData);
+//   }
+// }

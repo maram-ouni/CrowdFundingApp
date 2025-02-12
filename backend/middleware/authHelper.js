@@ -24,6 +24,20 @@ exports.validateApiSecret = (req,res,next) =>{
   }
 
   const api_secret_key = req.headers["x-api-key"];
+  // console.log(api_secret_key);
+  // console.log(process.env.api_secret_key);
+//   const bcrypt = require("bcryptjs");
+// const secretKey = '8\$dsfsfgreb6&4w5fsdjdjkje#\$54757jdskjrekrm@#\$@\$%&8fdddg*&*ffdsds'; // Remplace par ta clé API en clair
+// const saltRounds = 10;
+
+// bcrypt.hash(secretKey, saltRounds, function(err, hash) {
+//   if (err) {
+//     console.error("Erreur de hachage :", err);
+//   } else {
+//     console.log("Clé API hachée :", hash);
+//   }
+// });
+
 
   //Checking if the API secret key is valid
 

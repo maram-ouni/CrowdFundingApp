@@ -79,12 +79,12 @@ const createCamp = async(req,res)=>{
 
         // INput field validation
 
-        if(req.file == undefined || req.file.size == 0){
-            return res.status(401).json({
-                error:"No valid image is provided",
-                result:false
-            })
-        }
+        // if(req.file == undefined || req.file.size == 0){
+        //     return res.status(401).json({
+        //         error:"No valid image is provided",
+        //         result:false
+        //     })
+        // }
         if(req.body.camp_name == "" || req.body.camp_name == undefined){
             return res.status(401).json({
                 error:"Input field camp_name is not valid",
@@ -122,7 +122,7 @@ const createCamp = async(req,res)=>{
             })
         }
 
-        const image_url = `http://3.135.1.141/media/camp/${req.file.filename}`;
+        const image_url =  "";
         const camp_name         =   req.body.camp_name;
         const camp_target       =   req.body.camp_target;
         const camp_equity       =   req.body.camp_equity;
