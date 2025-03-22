@@ -328,7 +328,7 @@ Future<dynamic> withDrawAmount(
   };
 
   var request =
-      http.Request('POST', Uri.parse('http://192.168.56.1:8080/api/withdrawAmount'));
+      http.Request('POST', Uri.parse('http://192.168.1.18:8080/api/withdrawAmount'));
   request.body = json.encode({
     "owner_address": campAddress,
     "owner_private_key": campPrivateKey,

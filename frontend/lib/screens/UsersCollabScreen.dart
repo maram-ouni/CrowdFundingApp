@@ -160,7 +160,7 @@
 //     'Authorization': token
 //   };
 //   var request =
-//       http.Request('GET', Uri.parse('http://192.168.56.1:8080/api/getUsersCollabs'));
+//       http.Request('GET', Uri.parse('http://192.168.1.18:8080/api/getUsersCollabs'));
 
 //   request.headers.addAll(headers);
 
@@ -339,7 +339,7 @@ Future<dynamic> getUsersCollaboration(String token) async {
 
   try {
     var request =
-        http.Request('GET', Uri.parse('http://192.168.56.1:8080/api/getUsersCollabs'));
+        http.Request('GET', Uri.parse('http://192.168.1.18:8080/api/getUsersCollabs'));
 
     request.headers.addAll(headers);
 

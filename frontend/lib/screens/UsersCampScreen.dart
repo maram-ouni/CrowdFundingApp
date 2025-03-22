@@ -128,7 +128,7 @@ Future<dynamic> getCampsCreatedByUser(String token ) async {
     'Authorization': token
   };
   var request = http.Request(
-      'GET', Uri.parse('http://192.168.56.1:8080/api/getCampsCreatedByUser'));
+      'GET', Uri.parse('http://192.168.1.18:8080/api/getCampsCreatedByUser'));
 
   request.headers.addAll(headers);
 

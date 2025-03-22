@@ -1,5 +1,5 @@
 const Tx        =   require('ethereumjs-tx').Transaction;
-const Web3      =   require('web3');
+const {Web3  }    =   require('web3');
 const { validationResult } = require("express-validator");
 require('dotenv').config();
 
@@ -7,8 +7,10 @@ require('dotenv').config();
 ///////////////////////////
 //Web3 and contract setup
 ///////////////////////////
+const alchemyApiKey = process.env.ALCHEMY_API_KEY;
 
-const rpcURL = 'https://ropsten.infura.io/v3/7a0de82adffe468d8f3c1e2183b37c39';
+
+const rpcURL = `https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`;
 
 const web3 = new Web3(rpcURL);
 

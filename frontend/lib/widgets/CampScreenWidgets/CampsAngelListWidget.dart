@@ -268,7 +268,7 @@ class _CampsAngelListWidgetState extends State<CampsAngelListWidget> {
 Future<dynamic> getCampsAngels(String campAddress) async {
   var headers = {'Content-Type': 'application/json'};
   var request = http.Request(
-      'POST', Uri.parse('http://192.168.56.1:8080/api/getCampsAngelInvestors'));
+      'POST', Uri.parse('http://192.168.1.18:8080/api/getCampsAngelInvestors'));
   request.body = json.encode({"camp_address": campAddress});
   request.headers.addAll(headers);
 
@@ -283,7 +283,7 @@ Future<dynamic> getAngelsFunding(
     String campAddress, String angelAddress) async {
   var headers = {'Content-Type': 'application/json'};
   var request = http.Request(
-      'POST', Uri.parse('http://192.168.56.1:8080/api/getFundingDetails'));
+      'POST', Uri.parse('http://192.168.1.18:8080/api/getFundingDetails'));
   request.body =
       json.encode({"camp_address": campAddress, "angel_address": angelAddress});
   request.headers.addAll(headers);

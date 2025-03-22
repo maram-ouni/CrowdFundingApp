@@ -1,48 +1,54 @@
 require('dotenv').config();
-const HDWalletProvider = require('truffle-hdwallet-provider-privkey');
-const privateKeys = process.env.privatekey_1;
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+
+// Récupération des variables d'environnement
+const privateKey = process.env.PRIVATE_KEY;
+const alchemyApiKey = process.env.ALCHEMY_API_KEY;
+
+// Vérifier si la clé privée est définie
+if (!privateKey) {
+  throw new Error("⚠️  La clé privée n'est pas définie dans le fichier .env !");
+}
+
+// Vérifier si l'API Key Alchemy est définie
+if (!alchemyApiKey) {
+  throw new Error("⚠️  La clé API Alchemy n'est pas définie dans le fichier .env !");
+}
 
 module.exports = {
-
   networks: {
-    
     development: {
-     host: "127.0.0.1",     // Localhost (default: none)
-     port: 7545,            // Standard Ethereum port (default: none)
-     network_id: "*",       // Any network (default: none)
+      host: "127.0.0.1", // Localhost
+      port: 7545, // Port par défaut de Ganache
+      network_id: "*", // Accepte tous les réseaux
     },
-    ropsten: {
-      provider: function() {
-        return new HDWalletProvider(
-          privateKeys.split(','),
-          `https://ropsten.infura.io/v3/7a0de82adffe468d8f3c1e2183b37c39`// Url to an Ethereum Node
-        )
-      },
-      network_id: 3,
+
+    // 🔹 Sepolia Configuration avec Alchemy
+    sepolia: {
+      provider: () => new HDWalletProvider(
+        privateKey, // Clé privée unique
+        `https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}` // Alchemy
+      ),
+      network_id: 11155111, // ID de Sepolia
       gas: 5500000,     
       confirmations: 2,    
       timeoutBlocks: 200, 
       skipDryRun: true
-    }
- 
+    },
   },
 
-  // Set default mocha options here, use special reporters etc.
   mocha: {
     timeout: 100000
   },
 
-  // Configure your compilers
   compilers: {
     solc: {
-      version: "0.8.0",    // Fetch exact version from solc-bin (default: truffle's version)
-      docker: false,        // Use "0.5.1" you've installed locally with docker (default: false)
-      settings: {          // See the solidity docs for advice about optimization and evmVersion
-       optimizer: {
-         enabled: false,
-         runs: 200
-       },
-       evmVersion: "byzantium"
+      version: "0.8.21", // Solidity 0.8.21 (dernière version stable)
+      settings: {          
+        optimizer: {
+          enabled: true, // Optimisation activée pour réduire les frais de gas
+          runs: 200
+        },
       }
     },
   },

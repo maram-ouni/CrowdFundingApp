@@ -273,7 +273,7 @@
 //     'Content-Type': 'application/json'
 //   };
 //   var request =
-//       http.Request('POST', Uri.parse('http://192.168.56.1:8080/api/userRegister'));
+//       http.Request('POST', Uri.parse('http://192.168.1.18:8080/api/userRegister'));
 //   request.body =
 //       json.encode({"email": email, "username": username, "password": password});
 //   request.headers.addAll(headers);
@@ -469,6 +469,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       userRegister(emailController.text, usernameController.text, passwordController.text)
           .then((data) async {
         if (data['result'] == false) {
+          print(data);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Register Failed. Please try again", textAlign: TextAlign.center)),
           );
@@ -509,7 +510,7 @@ Future<dynamic> userRegister(String email, String username, String password) asy
 
   try {
     var response = await http.post(
-      Uri.parse('http://192.168.56.1:8080/api/userRegister'),
+      Uri.parse('http://192.168.1.18:8080/api/userRegister'),
       headers: headers,
       body: json.encode({"email": email, "username": username, "password": password}),
     );

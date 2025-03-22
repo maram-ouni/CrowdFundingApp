@@ -359,7 +359,7 @@ Future<dynamic> getAllCollabJobs(String token , String campID) async {
     'Authorization': token
   };
   var request = http.Request('GET',
-      Uri.parse('http://192.168.56.1:8080/api/getAllCollabJobForACamp/' + campID));
+      Uri.parse('http://192.168.1.18:8080/api/getAllCollabJobForACamp/' + campID));
   request.headers.addAll(headers);
 
   http.StreamedResponse response = await request.send();
@@ -375,7 +375,7 @@ Future<dynamic> sendCollabRequest(String token , String collabId) async {
     'Authorization': token
   };
   var request = http.Request(
-      'POST', Uri.parse('http://192.168.56.1:8080/api/sendRequestToCollab'));
+      'POST', Uri.parse('http://192.168.1.18:8080/api/sendRequestToCollab'));
   request.body = json.encode({"collab_job_id": collabId});
   request.headers.addAll(headers);
 

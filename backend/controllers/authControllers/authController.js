@@ -1,5 +1,5 @@
 const bcrypt        =   require("bcryptjs");
-const Web3          =   require('web3');
+const {Web3}          =   require('web3');
 const moment        =   require('moment-timezone');
 const CryptoJS      =   require("crypto-js");
 const UserAuthModel =   require("../../models/userAuthModel")
@@ -9,8 +9,10 @@ const {generateToken}       =   require("../../middleware/authHelper");
 
 
 require('dotenv').config();
+const alchemyApiKey = process.env.ALCHEMY_API_KEY;
 
-const rpcURL = 'https://ropsten.infura.io/v3/7a0de82adffe468d8f3c1e2183b37c39';
+
+const rpcURL = `https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`;
 
 const web3 = new Web3(rpcURL);
 

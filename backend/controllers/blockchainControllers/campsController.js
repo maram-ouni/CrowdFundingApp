@@ -1,5 +1,5 @@
 const Tx        =   require('ethereumjs-tx').Transaction;
-const Web3      =   require('web3');
+const {Web3}      =   require('web3');
 const moment    =   require('moment-timezone');
 const CryptoJS  =   require("crypto-js");
 const axios     =   require('axios');
@@ -16,8 +16,10 @@ const CollabModel       =   require("../../models/collabModel");
 ///////////////////////////
 //Web3 and contract setup
 ///////////////////////////
+const alchemyApiKey = process.env.ALCHEMY_API_KEY;
 
-const rpcURL = 'https://ropsten.infura.io/v3/7a0de82adffe468d8f3c1e2183b37c39';
+
+const rpcURL = `https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`;
 
 const web3 = new Web3(rpcURL);
 
@@ -74,179 +76,249 @@ console.log('Private Key as Buffer:', privateKey1);
 
 // const privateKey1 = Buffer.from(process.env.privateKey_1,'hex');
 
-const createCamp = async(req,res)=>{
-    try{
+// const createCamp = async(req,res)=>{
+//     try{
 
-        // INput field validation
+//         // INput field validation
 
-        // if(req.file == undefined || req.file.size == 0){
-        //     return res.status(401).json({
-        //         error:"No valid image is provided",
-        //         result:false
-        //     })
-        // }
-        if(req.body.camp_name == "" || req.body.camp_name == undefined){
-            return res.status(401).json({
-                error:"Input field camp_name is not valid",
-                result:false
-            })
-        }
-        if(req.body.camp_target == "" || req.body.camp_target == undefined){
-            return res.status(401).json({
-                error:"Input field camp_target is not valid",
-                result:false
-            })
-        }
-        if(req.body.camp_equity == "" || req.body.camp_equity == undefined){
-            return res.status(401).json({
-                error:"Input field camp_equity is not valid",
-                result:false
-            })
-        }
-        if(req.body.camp_description == "" || req.body.camp_description == undefined){
-            return res.status(401).json({
-                error:"Input field camp_description is not valid",
-                result:false
-            })
-        }
-        if(req.body.long_description == "" || req.body.long_description == undefined){
-            return res.status(401).json({
-                error:"Input field long_description is not valid",
-                result:false
-            })
-        }
-        if(req.body.category == "" || req.body.category == undefined){
-            return res.status(401).json({
-                error:"Input field category is not valid",
-                result:false
-            })
-        }
+//         // if(req.file == undefined || req.file.size == 0){
+//         //     return res.status(401).json({
+//         //         error:"No valid image is provided",
+//         //         result:false
+//         //     })
+//         // }
+//         if(req.body.camp_name == "" || req.body.camp_name == undefined){
+//             return res.status(401).json({
+//                 error:"Input field camp_name is not valid",
+//                 result:false
+//             })
+//         }
+//         if(req.body.camp_target == "" || req.body.camp_target == undefined){
+//             return res.status(401).json({
+//                 error:"Input field camp_target is not valid",
+//                 result:false
+//             })
+//         }
+//         if(req.body.camp_equity == "" || req.body.camp_equity == undefined){
+//             return res.status(401).json({
+//                 error:"Input field camp_equity is not valid",
+//                 result:false
+//             })
+//         }
+//         if(req.body.camp_description == "" || req.body.camp_description == undefined){
+//             return res.status(401).json({
+//                 error:"Input field camp_description is not valid",
+//                 result:false
+//             })
+//         }
+//         if(req.body.long_description == "" || req.body.long_description == undefined){
+//             return res.status(401).json({
+//                 error:"Input field long_description is not valid",
+//                 result:false
+//             })
+//         }
+//         if(req.body.category == "" || req.body.category == undefined){
+//             return res.status(401).json({
+//                 error:"Input field category is not valid",
+//                 result:false
+//             })
+//         }
 
-        const image_url =  "";
-        const camp_name         =   req.body.camp_name;
-        const camp_target       =   req.body.camp_target;
-        const camp_equity       =   req.body.camp_equity;
-        const camp_description  =   req.body.camp_description;
-        const long_description  =   req.body.long_description;
-        const category          =   req.body.category
-        const estGasPrice       =   await web3.eth.getGasPrice()*2;
-
-
-
-        // Checking if the camp name already exists
-
-        const campExists    =   await CampModel.findOne({name:camp_name});
-
-        if(campExists){
-            return res.status(400).json({
-                result:false,
-                msg:'Camp already exists'
-            })
-        }
-
-        // Create a eth account for camp
-
-        const ethAccount    =   await web3.eth.accounts.create();
-
-        if(!ethAccount){
-          return res.status(400).json({
-            msg:"There was a problem creating ETH account for the user",
-            result:false
-          });
-        }
-
-        // Using AES to encrypt the Ethereum private key
-
-        let ciphertext = CryptoJS.AES.encrypt(ethAccount.privateKey,process.env.master_key).toString();
+//         const image_url =  "";
+//         const camp_name         =   req.body.camp_name;
+//         const camp_target       =   req.body.camp_target;
+//         const camp_equity       =   req.body.camp_equity;
+//         const camp_description  =   req.body.camp_description;
+//         const long_description  =   req.body.long_description;
+//         const category          =   req.body.category
+//         const estGasPrice       =   await web3.eth.getGasPrice()*2;
 
 
-        // Saving the camp on Ethereum SC.
 
-        const txCount = await web3.eth.getTransactionCount(account_address);
-        if(!txCount){
-            return res.status(500).json({
-                result:false,
-                msg:'There was a problem creating a Camp'
-            })
-        }
-        // Build the transaction
-        const txObject = {
-            nonce:    web3.utils.toHex(txCount),
-            to:       contract_address,
-            gasLimit: web3.utils.toHex(500000),
-            gasPrice: web3.utils.toHex(estGasPrice),
-            data: contract.methods.createCamp(ethAccount.address,camp_target,camp_equity).encodeABI()
-        }
+//         // Checking if the camp name already exists
+
+//         const campExists    =   await CampModel.findOne({name:camp_name});
+
+//         if(campExists){
+//             return res.status(400).json({
+//                 result:false,
+//                 msg:'Camp already exists'
+//             })
+//         }
+
+//         // Create a eth account for camp
+
+//         const ethAccount    =   await web3.eth.accounts.create();
+
+//         if(!ethAccount){
+//           return res.status(400).json({
+//             msg:"There was a problem creating ETH account for the user",
+//             result:false
+//           });
+//         }
+
+//         // Using AES to encrypt the Ethereum private key
+
+//         let ciphertext = CryptoJS.AES.encrypt(ethAccount.privateKey,process.env.master_key).toString();
+
+
+//         // Saving the camp on Ethereum SC.
+
+//         const txCount = await web3.eth.getTransactionCount(account_address);
+//         if(!txCount){
+//             return res.status(500).json({
+//                 result:false,
+//                 msg:'There was a problem creating a Camp'
+//             })
+//         }
+//         // Build the transaction
+//         const txObject = {
+//             nonce:    web3.utils.toHex(txCount),
+//             to:       contract_address,
+//             gasLimit: web3.utils.toHex(500000),
+//             gasPrice: web3.utils.toHex(estGasPrice),
+//             data: contract.methods.createCamp(ethAccount.address,camp_target,camp_equity).encodeABI()
+//         }
     
-        // Sign the transaction
-        const tx = new Tx(txObject,{chain:3})
-        tx.sign(privateKey)
+//         // Sign the transaction
+//         const tx = new Tx(txObject,{chain:3})
+//         tx.sign(privateKey)
     
-        const serializedTx = tx.serialize()
-        const raw = '0x' + serializedTx.toString('hex')
+//         const serializedTx = tx.serialize()
+//         const raw = '0x' + serializedTx.toString('hex')
 
 
-        // Broadcast the transaction
+//         // Broadcast the transaction
 
-        await web3.eth.sendSignedTransaction(raw);
+//         await web3.eth.sendSignedTransaction(raw);
 
 
 
-        // Saving camp details to the database
+//         // Saving camp details to the database
 
-        const campDetails = new CampModel({
-            name                :   camp_name,  
-            owner               :   req.decoded.username,
-            createdOn           :   moment().format('MMMM Do YYYY, h:mm:ss a'),
-            target              :   camp_target,
-            equity              :   camp_equity,
-            address             :   ethAccount.address,   
-            privatekey          :   ciphertext,
-            camp_image          :   image_url,
-            camp_description    :   camp_description,
-            long_description    :   long_description,
-            category            :   category
-        });
+//         const campDetails = new CampModel({
+//             name                :   camp_name,  
+//             owner               :   req.decoded.username,
+//             createdOn           :   moment().format('MMMM Do YYYY, h:mm:ss a'),
+//             target              :   camp_target,
+//             equity              :   camp_equity,
+//             address             :   ethAccount.address,   
+//             privatekey          :   ciphertext,
+//             camp_image          :   image_url,
+//             camp_description    :   camp_description,
+//             long_description    :   long_description,
+//             category            :   category
+//         });
         
+
+//         const newCampDetails = await CampModel.create(campDetails);
+
+//         if(!newCampDetails){
+//             return res.status(500).json({
+//                 result:false,
+//                 msg:'There was a problem creating the camp',
+//             });
+//         }
+
+//         // Saving the camp id to userdetails
+
+//         const userDetailsUpdate = await UserDetailsModel.findOneAndUpdate({username:req.decoded.username},{
+//             $addToSet:{camps_owned:newCampDetails.id}
+//         })
+
+//         if(!userDetailsUpdate){
+//             return res.status(500).json({
+//                 result:false,
+//                 msg:'There was a problem creating the camp',
+//             });
+//         }
+
+//         return res.status(200).json({
+//             result:true,
+//             msg:'Camp created',
+//             camp:newCampDetails
+//         });
+        
+//     }
+//     catch(err){
+//         console.log(err);
+//         // console.log(web3.utils.hexToAscii(err.receipt.logsBloom));
+//         res.status(500).json({
+//             result:false,
+//             msg:'There was a problem creating the camp. Note - Camp name needs to be unique.'
+//         })
+//     }
+// }
+const createCamp = async (req, res) => {
+    try {
+        // Validation des champs d'entrée
+        if (!req.body.camp_name) {
+            return res.status(401).json({ error: "Input field camp_name is not valid", result: false });
+        }
+        if (!req.body.camp_target) {
+            return res.status(401).json({ error: "Input field camp_target is not valid", result: false });
+        }
+        if (!req.body.camp_equity) {
+            return res.status(401).json({ error: "Input field camp_equity is not valid", result: false });
+        }
+        if (!req.body.camp_description) {
+            return res.status(401).json({ error: "Input field camp_description is not valid", result: false });
+        }
+        if (!req.body.long_description) {
+            return res.status(401).json({ error: "Input field long_description is not valid", result: false });
+        }
+        if (!req.body.category) {
+            return res.status(401).json({ error: "Input field category is not valid", result: false });
+        }
+
+        const camp_name = req.body.camp_name;
+        const camp_target = req.body.camp_target;
+        const camp_equity = req.body.camp_equity;
+        const camp_description = req.body.camp_description;
+        const long_description = req.body.long_description;
+        const category = req.body.category;
+        const image_url = req.body.camp_image;
+
+        // Vérifier si le camp existe déjà
+        const campExists = await CampModel.findOne({ name: camp_name });
+        if (campExists) {
+            return res.status(400).json({ result: false, msg: 'Camp already exists' });
+        }
+
+        // Sauvegarde du camp dans la base de données
+        const campDetails = new CampModel({
+            name: camp_name,
+            owner: req.decoded.username,
+            createdOn: moment().format('MMMM Do YYYY, h:mm:ss a'),
+            target: camp_target,
+            equity: camp_equity,
+            camp_image: image_url,
+            camp_description: camp_description,
+            long_description: long_description,
+            category: category
+        });
 
         const newCampDetails = await CampModel.create(campDetails);
-
-        if(!newCampDetails){
-            return res.status(500).json({
-                result:false,
-                msg:'There was a problem creating the camp',
-            });
+        if (!newCampDetails) {
+            return res.status(500).json({ result: false, msg: 'There was a problem creating the camp' });
         }
 
-        // Saving the camp id to userdetails
+        // Mise à jour des détails de l'utilisateur
+        const userDetailsUpdate = await UserDetailsModel.findOneAndUpdate(
+            { username: req.decoded.username },
+            { $addToSet: { camps_owned: newCampDetails.id } }
+        );
 
-        const userDetailsUpdate = await UserDetailsModel.findOneAndUpdate({username:req.decoded.username},{
-            $addToSet:{camps_owned:newCampDetails.id}
-        })
-
-        if(!userDetailsUpdate){
-            return res.status(500).json({
-                result:false,
-                msg:'There was a problem creating the camp',
-            });
+        if (!userDetailsUpdate) {
+            return res.status(500).json({ result: false, msg: 'There was a problem updating user details' });
         }
 
-        return res.status(200).json({
-            result:true,
-            msg:'Camp created',
-            camp:newCampDetails
-        });
-        
-    }
-    catch(err){
+        return res.status(200).json({ result: true, msg: 'Camp created', camp: newCampDetails });
+    } catch (err) {
         console.log(err);
-        // console.log(web3.utils.hexToAscii(err.receipt.logsBloom));
-        res.status(500).json({
-            result:false,
-            msg:'There was a problem creating the camp. Note - Camp name needs to be unique.'
-        })
+        res.status(500).json({ result: false, msg: 'There was a problem creating the camp' });
     }
-}
+};
 
 
 const getCampList = async(req,res)=>{
@@ -530,95 +602,178 @@ const buyEquity = async(req,res)=>{
 }
 
 
-const getCampDetails = async(req,res)=>{
-    try{
-        //Input field validation
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({
-                error: errors.array()[0],result:false   
-            });
-        }
+// const getCampDetails = async(req,res)=>{
+//     try{
+//         //Input field validation
+//         const errors = validationResult(req);
+//         if (!errors.isEmpty()) {
+//             return res.status(422).json({
+//                 error: errors.array()[0],result:false   
+//             });
+//         }
 
-        const camp_address = req.body.camp_address;
+//         const camp_address = req.body.camp_address;
 
-        const campDetails = await contract.methods.camps(camp_address).call();
+//         const campDetails = await contract.methods.camps(camp_address).call();
 
-        if(!campDetails){
-            return res.status(500).json({
-                result:false,
-                msg:'There was a problem fetching the camp details'
-            })
-        }
+//         if(!campDetails){
+//             return res.status(500).json({
+//                 result:false,
+//                 msg:'There was a problem fetching the camp details'
+//             })
+//         }
 
-        return res.status(200).json({
-            result:true,
-            msg:'Camp details fetched',
-            details:campDetails
-        });
+//         return res.status(200).json({
+//             result:true,
+//             msg:'Camp details fetched',
+//             details:campDetails
+//         });
         
-    }
-    catch(err){
-        console.log(err);
-        res.status(500).json({
-            result:false,
-            msg:'There was a problem fetching the camp details'
-        })
-    }
-}
+//     }
+//     catch(err){
+//         console.log(err);
+//         res.status(500).json({
+//             result:false,
+//             msg:'There was a problem fetching the camp details'
+//         })
+//     }
+// }
 
 
-const getCampMasterDetails = async(req,res)=>{
-    try{
-        //Input field validation
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({
-                error: errors.array()[0],result:false   
-            });
-        }
+// const getCampMasterDetails = async(req,res)=>{
+//     try{
+//         //Input field validation
+//         const errors = validationResult(req);
+//         if (!errors.isEmpty()) {
+//             return res.status(422).json({
+//                 error: errors.array()[0],result:false   
+//             });
+//         }
 
-        const camp_address = req.body.camp_address;
+//         const camp_address = req.body.camp_address;
 
-        const campDetailsSC     =   await contract.methods.camps(camp_address).call();
-        const campDetailsDB     =   await CampModel.findOne({address:camp_address},{target:0,equity:0});   
+//         const campDetailsSC     =   await contract.methods.camps(camp_address).call();
+//         const campDetailsDB     =   await CampModel.findOne({address:camp_address},{target:0,equity:0});   
         
     
 
-        if(!campDetailsSC || !campDetailsDB){
-            return res.status(404).json({
-                result:false,
-                msg:'Camp not found'
-            })    
+//         if(!campDetailsSC || !campDetailsDB){
+//             return res.status(404).json({
+//                 result:false,
+//                 msg:'Camp not found'
+//             })    
+//         }
+
+//         const campCollabCount = await CollabModel.countDocuments({
+//             campID                      :   campDetailsDB._id,
+//             collaboratorSearchActive    :   false
+//         });
+
+
+//         const campDetailsMaster = {
+//             ...campDetailsSC,
+//             ...campDetailsDB._doc,
+//             campCollabCount
+//         }
+
+//         return res.status(200).json({
+//             result:true,
+//             msg:'Camp details fetched',
+//             details:campDetailsMaster
+//         });
+        
+//     }
+//     catch(err){
+//         console.log(err);
+//         res.status(500).json({
+//             result:false,
+//             msg:'There was a problem fetching the camp details'
+//         })
+//     }
+// }
+const getCampDetails = async (req, res) => {
+    try {
+        // Input field validation
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({
+                error: errors.array()[0], result: false
+            });
         }
 
-        const campCollabCount = await CollabModel.countDocuments({
-            campID                      :   campDetailsDB._id,
-            collaboratorSearchActive    :   false
-        });
+        const camp_address = req.body.camp_id;
 
+        const campDetails = await CampModel.findOne({ _id: camp_address });
 
-        const campDetailsMaster = {
-            ...campDetailsSC,
-            ...campDetailsDB._doc,
-            campCollabCount
+        if (!campDetails) {
+            return res.status(404).json({
+                result: false,
+                msg: 'Camp not found'
+            });
         }
 
         return res.status(200).json({
-            result:true,
-            msg:'Camp details fetched',
-            details:campDetailsMaster
+            result: true,
+            msg: 'Camp details fetched',
+            details: campDetails
         });
-        
-    }
-    catch(err){
+    } catch (err) {
         console.log(err);
         res.status(500).json({
-            result:false,
-            msg:'There was a problem fetching the camp details'
-        })
+            result: false,
+            msg: 'There was a problem fetching the camp details'
+        });
     }
-}
+};
+
+const getCampMasterDetails = async (req, res) => {
+    try {
+        // Input field validation
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({
+                error: errors.array()[0], result: false
+            });
+        }
+
+        const camp_address = req.body.camp_id;
+
+        const campDetailsDB = await CampModel.findOne(
+            { address: camp_address },
+            { target: 0, equity: 0 }
+        );
+
+        if (!campDetailsDB) {
+            return res.status(404).json({
+                result: false,
+                msg: 'Camp not found'
+            });
+        }
+
+        const campCollabCount = await CollabModel.countDocuments({
+            campID: campDetailsDB._id,
+            collaboratorSearchActive: false
+        });
+
+        const campDetailsMaster = {
+            ...campDetailsDB._doc,
+            campCollabCount
+        };
+
+        return res.status(200).json({
+            result: true,
+            msg: 'Camp details fetched',
+            details: campDetailsMaster
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            result: false,
+            msg: 'There was a problem fetching the camp details'
+        });
+    }
+};
+
 
 
 const getFundingDetails = async(req,res)=>{

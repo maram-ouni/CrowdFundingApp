@@ -269,7 +269,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
                         ),
                       );
                     } else {
-                      if (snapshot.data['result'] == false) {
+                      if (snapshot.data['result'] == false || snapshot.data == null) {
                         return Center(
                             child: Padding(
                           padding: const EdgeInsets.only(bottom: 150.0),
@@ -296,7 +296,7 @@ Future<dynamic> getUserBalance(String token ) async {
     'Authorization': token
   };
   var request = http.Request(
-      'GET', Uri.parse('http://192.168.56.1:8080/api/getUsersAccountBalance'));
+      'GET', Uri.parse('http://192.168.1.18:8080/api/getUsersAccountBalance'));
   request.headers.addAll(headers);
 
   http.StreamedResponse response = await request.send();
@@ -312,7 +312,7 @@ Future<dynamic> getCamps(String token ) async {
     'Authorization': token
   };
   var request =
-      http.Request('POST', Uri.parse('http://192.168.56.1:8080/api/getCampList'));
+      http.Request('POST', Uri.parse('http://192.168.1.18:8080/api/getCampList'));
   request.body = json.encode({"sort_by": "High target"});
   request.headers.addAll(headers);
 
